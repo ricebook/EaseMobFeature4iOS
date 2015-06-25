@@ -19,6 +19,10 @@ extension AppDelegate {
             EaseMob.sharedInstance().registerSDKWithAppKey(EMIMHelper.defaultHelper().appkey, apnsCertName: "ENJOY-Distribute-APNS")
         #endif
      
+        EaseMob.sharedInstance().chatManager.removeDelegate(self)
+        EaseMob.sharedInstance().chatManager.addDelegate(self, delegateQueue: nil)
+        
+        
         setUpNotifiers()
     }
     
@@ -99,5 +103,48 @@ extension AppDelegate {
         }
     }
 
+    func didReceiveMessage(message: EMMessage!) {
+        if UIApplication.sharedApplication().applicationState == .Active {
+            // TODO: App在活动中(运行中)如何给提示？ play sound? or other?
+            
+        }else {
+            // Local Notification
+            self.p_showLocalNotificationWithMessage(message)
+        }
+       
+    }
+    
+    private func p_showLocalNotificationWithMessage(message: EMMessage) {
+        let options = EaseMob.sharedInstance().chatManager.pushNotificationOptions
+        let localNotification = UILocalNotification()
+        localNotification.fireDate = NSDate()
+        
+        var messageStr: String = ""
+        
+        if options.displayStyle == .ePushNotificationDisplayStyle_messageSummary {
+            if let messageBody = message.messageBodies.first as? IEMMessageBody {
+                switch messageBody.messageBodyType {
+                case .eMessageBodyType_Text:
+                    if let textMessageBody = messageBody as? EMTextMessageBody {
+                        messageStr = textMessageBody.text
+                    }
+                case .eMessageBodyType_Image:
+                    messageStr = "图片"
+                default:
+                    break
+                }
+            }
+            localNotification.alertBody = "ENJOY在线客服:\(messageStr)"
+        }else {
+            localNotification.alertBody = "ENJOY客服回复了您一条新消息"
+        }
+        
+        localNotification.alertAction = "打开"
+
+        localNotification.timeZone = NSTimeZone.defaultTimeZone()
+        localNotification.soundName = UILocalNotificationDefaultSoundName;
+        //发送通知
+        UIApplication.sharedApplication().scheduleLocalNotification(localNotification)
+    }
     
 }

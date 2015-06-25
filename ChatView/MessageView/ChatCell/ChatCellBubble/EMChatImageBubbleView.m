@@ -85,7 +85,7 @@ NSString *const kRouterEventImageBubbleTapEventName = @"kRouterEventImageBubbleT
     
     NSString *imageName = model.isSender ? BUBBLE_RIGHT_IMAGE_NAME : BUBBLE_LEFT_IMAGE_NAME;
 //    UIImage *coloredImage = [UIImage imageNamed:imageName];
-    UIImage *coloredImage = [[UIImage imageNamed:imageName] stretchableImageWithLeftCapWidth:10 topCapHeight:34];
+    UIImage *coloredImage = [[UIImage imageNamed:imageName] stretchableImageWithLeftCapWidth:(model.isSender ? 10 : 15) topCapHeight:34];
     const UIImage *maskImageDrawnToSize = [coloredImage renderAtSize:image.size];
     self.imageView.image = [image maskWithImage:maskImageDrawnToSize];
 }
